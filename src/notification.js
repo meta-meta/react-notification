@@ -9,14 +9,15 @@ export default class Notification extends Component {
       PropTypes.string
     ]),
     onClick: PropTypes.func,
-    styles: PropTypes.oneOfType([
+    style: PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.bool
     ]),
     dismissAfter: PropTypes.number,
     onDismiss: PropTypes.func,
     className: PropTypes.string,
-    activeClassName: PropTypes.string
+    activeClassName: PropTypes.string,
+    isActive: PropTypes.bool
   }
 
   static defaultProps = {
@@ -65,6 +66,7 @@ export default class Notification extends Component {
         msTransition: '.5s cubic-bezier(0.89, 0.01, 0.5, 1.1)',
         OTransition: '.5s cubic-bezier(0.89, 0.01, 0.5, 1.1)',
         transition: '.5s cubic-bezier(0.89, 0.01, 0.5, 1.1)',
+
         // Trigger GPU acceleration
         WebkitTransform: 'translatez(0)',
         MozTransform: 'translatez(0)',
@@ -144,11 +146,12 @@ export default class Notification extends Component {
    */
   handleClick = (event) => {
     event.preventDefault();
+
     if (this.props.onClick && typeof this.props.onClick === 'function') {
-      this.props.onClick();
-    } else {
-      return;
+      return this.props.onClick(event);
     }
+
+    return event;
   }
 
   render() {
@@ -160,9 +163,18 @@ export default class Notification extends Component {
     return (
       <div className={className} style={this.getBarStyle()}>
         <div className="notification-bar-wrapper" onClick={this.handleClick}>
-          <span className="notification-bar-message">{this.props.message}</span>
+          <span
+            ref="message"
+            className="notification-bar-message"
+          >
+            {this.props.message}
+          </span>
           {this.props.action !== false ? (
-            <span className="notification-bar-action" style={this.getActionStyle()}>
+            <span
+              ref="action"
+              className="notification-bar-action"
+              style={this.getActionStyle()}
+            >
               {this.props.action}
             </span>
           ) : null}
@@ -170,5 +182,4 @@ export default class Notification extends Component {
       </div>
     );
   }
-
 }

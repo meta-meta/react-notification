@@ -1,10 +1,8 @@
-import React from 'react/addons';
-import ExecutionEnvironment from 'react/lib/ExecutionEnvironment';
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
 import jsdom from 'mocha-jsdom';
 import expect from 'expect';
 import Notification from '../src/notification';
-
-let TestUtils = React.addons.TestUtils;
 
 const MOCK = {
   message: 'Test',
@@ -27,9 +25,20 @@ const MOCK = {
 
 describe('Notification', () => {
   jsdom();
-  ExecutionEnvironment.canUseDOM = true;
 
-  it('should render message and action text', done => {
+  it('should be a valid element', done => {
+    const component = (
+      <Notification
+        message={MOCK.message}
+        action={MOCK.action}
+        onClick={MOCK.onClick}
+      />
+    );
+
+    if (TestUtils.isElement(component)) done();
+  });
+
+  it('should render correct message and action text', done => {
     const tree = TestUtils.renderIntoDocument(
       <Notification
         message={MOCK.message}
@@ -38,12 +47,11 @@ describe('Notification', () => {
       />
     );
 
-    let message = TestUtils.findRenderedDOMComponentWithClass(tree, 'notification-bar-message');
+    let { message, action } = tree.refs;
 
-    let action = TestUtils.findRenderedDOMComponentWithClass(tree, 'notification-bar-action');
+    expect(message.innerHTML).toBe(MOCK.message);
+    expect(action.innerHTML).toBe(MOCK.action);
 
-    expect(message.props.children).toBe(MOCK.message);
-    expect(action.props.children).toBe(MOCK.action);
     done();
   });
 
